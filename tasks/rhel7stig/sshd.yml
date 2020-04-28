@@ -1,0 +1,556 @@
+---
+# Copyright 2016, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Copy login warning banner
+  copy:
+    content: "{{ security_login_banner_text }}"
+    dest: "{{ security_sshd_banner_file }}"
+    owner: root
+    group: root
+  tags:
+    - high
+    - sshd
+    - V-71861
+    - V-72225
+
+- name: Stat /etc/ssh/sshd_config
+  stat:
+    path: /etc/ssh/sshd_config
+  register: sshd_config_check
+  tags:
+    - high
+    - sshd
+    - V-71939
+    - V-71957
+    - V-71959
+    - V-72221
+    - V-72225
+    - V-72237
+    - V-72239
+    - V-72241
+    - V-72243
+    - V-72245
+    - V-72247
+    - V-72249
+    - V-72251
+    - V-72253
+    - V-72259
+    - V-72261
+    - V-72263
+    - V-72265
+    - V-72267
+    - V-72303
+
+- name: Remove 'PermitEmptyPaswords yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_empty_password | bool
+  tags:
+    - high
+    - sshd
+    - V-71939
+
+- name: Add 'PermitEmptyPaswords no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitEmptyPasswords\sno'
+    line: 'PermitEmptyPasswords no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_empty_password | bool
+  tags:
+    - high
+    - sshd
+    - V-71939
+
+- name: Remove 'PermitUserEnvironment yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitUserEnvironment\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_environment_override | bool
+  tags:
+    - high
+    - sshd
+    - V-71957
+
+- name: Add 'PermitUserEnvironment no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitUserEnvironment\sno'
+    line: 'PermitUserEnvironment no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_environment_override | bool
+  tags:
+    - high
+    - sshd
+    - V-71957
+
+- name: Remove 'HostbasedAuthentication yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^HostbasedAuthentication\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_host_based_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-71959
+
+- name: Add 'HostbasedAuthentication no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^HostbasedAuthentication\sno'
+    line: 'HostbasedAuthentication no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_host_based_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-71959
+
+- name: Add ciphers in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Ciphers.*'
+    line: 'Ciphers {{ security_sshd_cipher_list }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_cipher | bool
+  tags:
+    - high
+    - sshd
+    - V-72221
+
+- name: Add or udpate banner in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^banner.*'
+    line: 'banner {{ security_sshd_banner_file }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_banner | bool
+  tags:
+    - high
+    - sshd
+    - V-72225
+
+- name: Add or update 'ClientAliveInterval' in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval.*'
+    line: 'ClientAliveInterval {{ security_sshd_client_alive_interval }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_client_alive | bool
+  tags:
+    - high
+    - sshd
+    - V-72237
+
+- name: Remove 'RhostsRSAAuthentication yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^RhostsRSAAuthentication\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_known_hosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72239
+
+- name: Add 'RhostsRSAAuthentication no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^RhostsRSAAuthentication\sno'
+    line: 'RhostsRSAAuthentication no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_known_hosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72239
+
+- name: Add or update 'ClientAliveCountMax' in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^ClientAliveCountMax.*'
+    line: 'ClientAliveCountMax {{ security_sshd_client_alive_count_max }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_client_alive | bool
+  tags:
+    - high
+    - sshd
+    - V-72241
+
+- name: Remove 'IgnoreRhosts no' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^IgnoreRhosts\sno'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_rhosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72243
+
+- name: Add 'IgnoreRhosts yes' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^IgnoreRhosts\syes'
+    line: 'IgnoreRhosts yes'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_rhosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72243
+
+- name: Remove 'PrintLastLog no' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PrintLastLog\sno'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_print_last_log | bool
+  tags:
+    - high
+    - sshd
+    - V-72245
+
+- name: Add 'PrintLastLog yes' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PrintLastLog\syes'
+    line: 'PrintLastLog yes'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_print_last_log | bool
+  tags:
+    - high
+    - sshd
+    - V-72245
+
+- name: Remove 'PermitRootLogin yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_root_login | bool
+  tags:
+    - high
+    - sshd
+    - V-72247
+
+- name: Add 'PermitRootLogin' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin.*'
+    line: 'PermitRootLogin {{ security_sshd_disallow_root_login_option }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_root_login | bool
+  tags:
+    - high
+    - sshd
+    - V-72247
+
+- name: Remove 'IgnoreUserKnownHosts no' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^IgnoreUserKnownHosts\sno'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_known_hosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72249
+
+- name: Add 'IgnoreUserKnownHosts yes' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^IgnoreUserKnownHosts\syes'
+    line: 'IgnoreUserKnownHosts yes'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_known_hosts_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72249
+
+- name: Add or update 'Protocol' in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Protocol.*'
+    line: 'Protocol {{ security_sshd_protocol_version }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_protocol | bool
+  tags:
+    - high
+    - sshd
+    - V-72251
+
+- name: Add or update MACs in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^MACs.*'
+    line: 'MACs {{ security_sshd_allowed_macs_list }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_allowed_macs | bool
+  tags:
+    - high
+    - sshd
+    - V-72253
+
+- name: Remove 'GSSAPIAuthentication yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^GSSAPIAuthentication\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_gssapi | bool
+  tags:
+    - high
+    - sshd
+    - V-72259
+
+- name: Add 'GSSAPIAuthentication no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^GSSAPIAuthentication\sno'
+    line: 'GSSAPIAuthentication no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_gssapi | bool
+  tags:
+    - high
+    - sshd
+    - V-72259
+
+- name: Remove 'KerberosAuthentication yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KerberosAuthentication\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disable_kerberos_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72261
+
+- name: Add 'KerberosAuthentication no' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KerberosAuthentication\sno'
+    line: 'KerberosAuthentication no'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disable_kerberos_auth | bool
+  tags:
+    - high
+    - sshd
+    - V-72261
+
+- name: Remove 'StrictModes no' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^StrictModes\sno'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_enable_strict_modes | bool
+  tags:
+    - high
+    - sshd
+    - V-72263
+
+- name: Add 'StrictModes yes' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^StrictModes\syes'
+    line: 'StrictModes yes'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_enable_strict_modes | bool
+  tags:
+    - high
+    - sshd
+    - V-72263
+
+- name: Add or udpate 'UsePrivilegeSeparation sandbox' in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UsePrivilegeSeparation.*'
+    line: 'UsePrivilegeSeparation sandbox'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_enable_privilege_separation | bool
+  tags:
+    - high
+    - sshd
+    - V-72265
+
+- name: Remove 'Compression yes' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Compression\syes'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_compression | bool
+  tags:
+    - high
+    - sshd
+    - V-72267
+
+- name: Add 'Compression' 'no' or 'delayed' in sshd_config
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Compression.*'
+    line: 'Compression {{ security_sshd_disallow_compression_option }}'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_disallow_compression | bool
+  tags:
+    - high
+    - sshd
+    - V-72267
+
+- name: Remove 'X11Forwarding no' in sshd_config if present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding\sno'
+    state: absent
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_enable_x11_forwarding | bool
+  tags:
+    - high
+    - sshd
+    - V-72303
+
+- name: Add 'X11Forwarding yes' in sshd_config if not present
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^X11Forwarding\syes'
+    line: 'X11Forwarding yes'
+    state: present
+  when:
+    - sshd_config_check.stat.exists == True
+    - security_sshd_enable_x11_forwarding | bool
+  tags:
+    - high
+    - sshd
+    - V-72303
+
+- name: Ensure sshd is enabled at boot time
+  service:
+    name: "{{ ssh_service }}"
+    enabled: yes
+  when:
+    - security_enable_sshd | bool
+  tags:
+    - medium
+    - sshd
+    - V-72235
+
+- name: Determine existing public ssh host keys
+  shell: ls /etc/ssh/*.pub
+  register: public_ssh_host_keys
+  # The shell command will always report 'changed' so we need to
+  # ignore that since this role is supposed to be idempotent.
+  changed_when: false
+  check_mode: no
+  tags:
+    - always
+
+- name: Public host key files must have mode 0644 or less
+  file:
+    path: "{{ item }}"
+    mode: "u-xX,g-wxs,o-wxt"
+  with_items:
+    - "{{ public_ssh_host_keys.stdout_lines | default([]) }}"
+  tags:
+    - medium
+    - sshd
+    - V-72255
+
+- name: Determine existing private ssh host keys
+  shell: ls /etc/ssh/*_key
+  register: private_ssh_host_keys
+  # The shell command will always report 'changed' so we need to
+  # ignore that since this role is supposed to be idempotent
+  changed_when: false
+  check_mode: no
+  tags:
+    - always
+
+- name: Private host key files must have mode 0600 or less
+  file:
+    path: "{{ item }}"
+    mode: "u-xX,g-rwxs,o-rwxt"
+  with_items:
+    - "{{ private_ssh_host_keys.stdout_lines | default([]) }}"
+  tags:
+    - medium
+    - sshd
+    - V-72257

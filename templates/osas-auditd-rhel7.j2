@@ -1,0 +1,363 @@
+# Auditd rules
+# /etc/audit/rules.d/audit.rules
+
+# Delete all existing auditd rules prior to loading this ruleset.
+-D
+
+# Increase the buffers to survive stress events.
+-b 8192
+
+# V-72081: The operating system must shut down upon audit processing failure,
+# unless availability is an overriding concern. If availability is a concern,
+# the system must alert the designated staff (System Administrator [SA] and
+# Information System Security Officer [ISSO] at a minimum) in the event of an
+# audit processing failure.Set the auditd failure flag.
+-f {{ security_rhel7_audit_failure_flag }}
+
+{% if security_rhel7_audit_execve | bool %}
+# V-72095: The operating system must audit all executions of privileged functions.
+-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid
+-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid
+-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid
+-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_chown | bool %}
+# V-72097: The operating system must audit all uses of the chown syscall.
+-a always,exit -F arch=b32 -S chown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fchown | bool %}
+# V-72099: The operating system must audit all uses of the fchown syscall.
+-a always,exit -F arch=b32 -S fchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_lchown | bool %}
+# V-72101: The operating system must audit all uses of the lchown syscall.
+-a always,exit -F arch=b32 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fchownat | bool %}
+# V-72103: The operating system must audit all uses of the fchownat syscall.
+-a always,exit -F arch=b32 -S fchownat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fchownat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_chmod | bool %}
+# V-72105: The operating system must audit all uses of the chmod syscall.
+-a always,exit -F arch=b32 -S chmod -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S chmod -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fchmod | bool %}
+# V-72107: The operating system must audit all uses of the fchmod syscall.
+-a always,exit -F arch=b32 -S fchmod -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fchmod -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fchmodat | bool %}
+# V-72109: The operating system must audit all uses of the fchmodat syscall.
+-a always,exit -F arch=b32 -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_setxattr | bool %}
+# V-72111: The operating system must audit all uses of the setxattr syscall.
+-a always,exit -F arch=b32 -S setxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S setxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fsetxattr | bool %}
+# V-72113: The operating system must audit all uses of the fsetxattr syscall.
+-a always,exit -F arch=b32 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_lsetxattr | bool %}
+# V-72115: The operating system must audit all uses of the lsetxattr syscall.
+-a always,exit -F arch=b32 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_removexattr | bool %}
+# V-72117: The operating system must audit all uses of the removexattr syscall.
+-a always,exit -F arch=b32 -S removexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S removexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_fremovexattr | bool %}
+# V-72119: The operating system must audit all uses of the fremovexattr syscall.
+-a always,exit -F arch=b32 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_lremovexattr | bool %}
+# V-72121: The operating system must audit all uses of the lremovexattr syscall.
+-a always,exit -F arch=b32 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_creat | bool %}
+# V-72123: The operating system to generate audit records when successful or
+# unsuccessful attempts to use the "creat" syscall occur.
+-a always,exit -F arch=b32 -S creat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S creat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S creat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S creat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_open | bool %}
+# V-72125: The operating system must audit all uses of the open syscall.
+-a always,exit -F arch=b32 -S open -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S open -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S open -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S open -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_openat | bool %}
+# V-72127: The operating system must audit all uses of the openat syscall.
+-a always,exit -F arch=b32 -S openat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S openat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S openat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S openat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_open_by_handle_at | bool %}
+# V-72129: The operating system must audit all uses of the open_by_handle_at syscall.
+-a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_truncate | bool %}
+# V-72131: The operating system must audit all uses of the truncate syscall.
+-a always,exit -F arch=b32 -S truncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S truncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_ftruncate | bool %}
+# V-72133: The operating system must audit all uses of the ftruncate syscall.
+-a always,exit -F arch=b32 -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_semanage | bool %}
+# V-72135: The operating system must audit all uses of the semanage command.
+-a always,exit -F path=/usr/sbin/semanage -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_setsebool | bool %}
+# V-72137: The operating system must audit all uses of the setsebool command.
+-a always,exit -F path=/usr/sbin/setsebool -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_chcon | bool %}
+# V-72139: The operating system must audit all uses of the chcon command.
+-a always,exit -F path=/usr/bin/chcon -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_setfiles | bool %}
+# V-72141: The operating system must audit all uses of the setfiles command.
+-a always,exit -F path=/usr/sbin/setfiles -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_account_access | bool %}
+# V-72145: The operating system must generate audit records for all
+# unsuccessful account access events.
+-w /var/run/faillock -p wa -k logins
+# V-72147: The operating system must generate audit records for all
+# successful account access events.
+-w /var/log/lastlog -p wa -k logins
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_passwd | bool %}
+# V-72149: The operating system must audit all uses of the passwd command.
+-a always,exit -F path=/usr/bin/passwd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_unix_chkpwd | bool %}
+# V-72151: The operating system must audit all uses of the unix_chkpwd command.
+-a always,exit -F path=/usr/sbin/unix_chkpwd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_gpasswd | bool %}
+# V-72153: The operating system must audit all uses of the gpasswd command.
+-a always,exit -F path=/usr/bin/gpasswd -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_chage | bool %}
+# V-72155: The operating system must audit all uses of the chage command.
+-a always,exit -F path=/usr/bin/chage -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_userhelper | bool %}
+# V-72157: The operating system must audit all uses of the userhelper command.
+-a always,exit -F path=/usr/sbin/userhelper -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_su | bool %}
+# V-72159: The operating system must audit all uses of the su command.
+-a always,exit -F path=/usr/bin/su -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_sudo | bool %}
+# V-72161: The operating system must audit all uses of the sudo command.
+-a always,exit -F path=/usr/bin/sudo -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_sudo_config_changes | bool %}
+# V-72163: The operating system must generate audit records containing
+# the full-text recording of modifications to sudo configuration files.
+-w /etc/sudoers -p wa -k privileged-actions
+-w /etc/sudoers.d/ -p wa -k privileged-actions
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_newgrp | bool %}
+# V-72165: The operating system must audit all uses of the newgrp command.
+-a always,exit -F path=/usr/bin/newgrp -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_chsh | bool %}
+# V-72167: The operating system must audit all uses of the chsh command.
+-a always,exit -F path=/usr/bin/chsh -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_mount | bool %}
+# V-72171: The operating system must audit all uses of the mount command and
+# syscall.
+-a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount
+-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount
+-a always,exit -F path=/usr/bin/mount -F auid>=1000 -F auid!=4294967295 -k privileged-mount
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_umount | bool %}
+# V-72173: The operating system must audit all uses of the umount command.
+-a always,exit -F path=/usr/bin/umount -F auid>=1000 -F auid!=4294967295 -k privileged-mount
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_postdrop | bool %}
+# V-72175: The operating system must audit all uses of the postdrop command.
+-a always,exit -F path=/usr/sbin/postdrop -F auid>=1000 -F auid!=4294967295 -k privileged-postfix
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_postqueue | bool %}
+# V-72177: The operating system must audit all uses of the postqueue command.
+-a always,exit -F path=/usr/sbin/postqueue -F auid>=1000 -F auid!=4294967295 -k privileged-postfix
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_ssh_keysign | bool %}
+# V-72179: The operating system must audit all uses of the ssh-keysign command.
+-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F auid>=1000 -F auid!=4294967295 -k privileged-ssh
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_crontab | bool %}
+# V-72183: The operating system must audit all uses of the crontab command.
+-a always,exit -F path=/usr/bin/crontab -F auid>=1000 -F auid!=4294967295 -k privileged-cron
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_pam_timestamp_check | bool %}
+# V-72185: The operating system must audit all uses of the pam_timestamp_check command.
+-a always,exit -F path=/usr/sbin/pam_timestamp_check -F auid>=1000 -F auid!=4294967295 -k privileged-pam
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_init_module | bool %}
+# V-72187: The operating system must audit all uses of the init_module syscall.
+-a always,exit -F arch=b32 -S init_module -k module-change
+-a always,exit -F arch=b64 -S init_module -k module-change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_delete_module | bool %}
+# V-72189: The operating system must audit all uses of the delete_module syscall.
+-a always,exit -F arch=b32 -S delete_module -k module-change
+-a always,exit -F arch=b64 -S delete_module -k module-change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_kmod | bool %}
+# V-72191: The operating system must audit all uses of the kmod command.
+-w /usr/bin/kmod -p x -F auid!=4294967295 -k module-change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_account_actions | bool %}
+# V-72197: The operating system must generate audit records for all account
+# creations, modifications, disabling, and termination events that affect
+# "/etc/passwd".
+-w /etc/passwd -p wa -k identity
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_rename | bool %}
+# V-72199: The operating system must audit all uses of the rename syscall.
+-a always,exit -F arch=b32 -S rename -F auid>=1000 -F auid!=4294967295 -k delete
+-a always,exit -F arch=b64 -S rename -F auid>=1000 -F auid!=4294967295 -k delete
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_renameat | bool %}
+# V-72201: The operating system must audit all uses of the renameat syscall.
+-a always,exit -F arch=b32 -S renameat -F auid>=1000 -F auid!=4294967295 -k delete
+-a always,exit -F arch=b64 -S renameat -F auid>=1000 -F auid!=4294967295 -k delete
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_rmdir | bool %}
+# V-72203: The operating system must audit all uses of the rmdir syscall.
+-a always,exit -F arch=b32 -S rmdir -F auid>=1000 -F auid!=4294967295 -k delete
+-a always,exit -F arch=b64 -S rmdir -F auid>=1000 -F auid!=4294967295 -k delete
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_unlink | bool %}
+# V-72205: The operating system must audit all uses of the unlink syscall.
+-a always,exit -F arch=b32 -S unlink -F auid>=1000 -F auid!=4294967295 -k delete
+-a always,exit -F arch=b64 -S unlink -F auid>=1000 -F auid!=4294967295 -k delete
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_unlinkat | bool %}
+# V-72207: The operating system must audit all uses of the unlinkat syscall.
+-a always,exit -F arch=b32 -S unlinkat -F auid>=1000 -F auid!=4294967295 -k delete
+-a always,exit -F arch=b64 -S unlinkat -F auid>=1000 -F auid!=4294967295 -k delete
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_group | bool %}
+# V-73165: The operating system must generate audit records for all account
+# creations, modifications, disabling, and termination events that affect
+# /etc/group.
+-w /etc/group -p wa -k identity
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_gshadow | bool %}
+# V-73167: The operating system must generate audit records for all account
+# creations, modifications, disabling, and termination events that affect
+# /etc/gshadow.
+-w /etc/gshadow -p wa -k identity
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_shadow | bool %}
+# V-73171: The operating system must generate audit records for all account
+# creations, modifications, disabling, and termination events that affect
+# /etc/shadow.
+-w /etc/shadow -p wa -k identity
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_opasswd | bool %}
+# V-73173: The operating system must generate audit records for all account
+# creations, modifications, disabling, and termination events that affect
+# /etc/opasswd.
+-w /etc/security/opasswd -p wa -k identity
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_create_module | bool %}
+# V-78999: The operating system must audit all uses of the create_module syscall.
+-a always,exit -F arch=b32 -S create_module -k module-change
+-a always,exit -F arch=b64 -S create_module -k module-change
+{% endif %}
+{# -------------------------------------------------------------------------- #}
+{% if security_rhel7_audit_finit_module | bool %}
+# V-79001: The operating system must audit all uses of the finit_module syscall.
+-a always,exit -F arch=b32 -S finit_module -k module-change
+-a always,exit -F arch=b64 -S finit_module -k module-change
+{% endif %}

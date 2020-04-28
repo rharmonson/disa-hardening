@@ -1,0 +1,5 @@
+#!/bin/sh -e
+cat << EOF
+set superusers="root"
+export superusers
+EOF
