@@ -141,6 +141,19 @@
     - medium
     - V-71859
 
+- name: Disable GDM login user list
+  copy:
+    src: dconf-disable-userlist
+    dest: /etc/dconf/db/gdm.d/02-disable-userlist
+  when:
+    - security_disable_gdm_user_list | bool
+  notify:
+    - dconf update
+  tags:
+    - graphical
+    - low
+    - V-none
+
 - name: Create a GDM keyfile for machine-wide settings
   template:
     src: dconf-gdm-banner-message.j2
