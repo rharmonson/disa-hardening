@@ -1,0 +1,102 @@
+---
+- name: Harden all systems
+  hosts: all
+  become: yes
+  vars:
+    # Review and change before applying role
+    # ======================================
+    # Use the reference below to understand the intent and solutions.
+    # https://www.stigviewer.com/stig/red_hat_enterprise_linux_7/
+
+    # To meet STIG requirements, either set value to 2 or 1 using an email
+    # notification AND document. A value of 2 results in a kernal panic by
+    # design on auditd critical errors--the bad guy is trying to break auditd.
+    security_rhel7_audit_failure_flag: 1                          # V-72081
+
+    # Disabled; enabled by default
+    # ============================
+    security_rhel7_remove_xorg: no                                # V-72307
+    security_rhel7_disable_usb_storage: no                        # V-71983
+    security_rhel7_disable_autofs: no                             # V-71985
+    security_enable_firewalld_rate_limit: no                      # V-72271
+    #security_enable_firewalld_rate_limit_per_minute: 25           # V-72271
+    #security_enable_firewalld_rate_limit_burst: 100               # V-72271
+    #security_disallow_source_routed_packet_forward_ipv4: no       # V-72283 / V-72285
+
+    # Enabled; disabled by default
+    # ============================
+    # Enable and set gdm login banner.
+    security_enable_graphical_login_message: yes                 # V-71859
+    security_enable_graphical_login_message_text: 'Warning! This government computer system is the property of the California Natural Resources Agency and may only be accessed by authorized users. Unauthorized access, use, disruption, modification, or destruction of this system is strictly prohibited and may be subject to criminal prosecution and/or adverse action. The California Natural Resources Agency may monitor any activity or communications on the system and retrieve any information stored within the system. By accessing and using this system, you are consenting to such monitoring and information retrieval for law enforcement and other purposes. Users can have no expectation of privacy as to any communication on or information created, maintained and stored within the system, including information stored centrally, locally on a disk drive, or on removable electronic storage media. The penalties for unauthorized access or use may include criminal and/or civil action under the California Information Practices Act of 1977, California Civil Code §§1798 et seq. and Penal Code 502.'
+    # Enable and set sshd login banner.
+    security_sshd_banner: yes                                    # V-72225
+    security_login_banner_text: |                                # V-72225 / V-71863
+      ------------------------------------------------------------------------------
+      * WARNING!                                                                   *
+      * This government computer system is the property of the California Natural  *
+      * Resources Agency and may only be accessed by authorized users.             * 
+      * Unauthorized access, use, disruption, modification, or destruction of this *
+      * system is strictly prohibited and may be subject to criminal prosecution   *
+      * and/or adverse action. The California Natural Resources Agency may monitor *
+      * any activity or communications on the system and retrieve any information  *
+      * stored within the system. By accessing and using this system, you are      *
+      * consenting to such monitoring and information retrieval for law            *
+      * enforcement and other purposes. Users can have no expectation of privacy   *
+      * as to any communication on or information created, maintained and stored   *
+      * within the system, including information stored centrally, locally on a    *
+      * disk drive, or on removable electronic storage media. The penalties for    *
+      * unauthorized access or use may include criminal and/or civil action under  *
+      * the California Information Practices Act of 1977, California Civil Code    *
+      * §§1798 et seq. and Penal Code 502.                                         *
+      ------------------------------------------------------------------------------
+
+
+    security_disable_gdm_user_list: yes                           # V-none
+    #security_sshd_permit_root_login: yes                          # V-72247
+    security_set_minimum_password_lifetime: yes                   # V-71927
+    security_set_maximum_password_lifetime: yes                   # V-71931
+    security_rhel7_initialize_aide: yes                           # V-71973
+    security_audisp_remote_plugin_active: yes                     # V-81015
+    #security_audisp_remote_server: '192.168.22.11'                # V-72083
+    #security_audisp_enable_krb5: yes                              # V-72085
+    security_rhel7_audit_chmod: yes                               # V-72105
+    security_rhel7_audit_chown: yes                               # V-72097
+    security_rhel7_audit_fchmod: yes                              # V-72107
+    security_rhel7_audit_fchmodat: yes                            # V-72109
+    security_rhel7_audit_fchown: yes                              # V-72099
+    security_rhel7_audit_fchownat: yes                            # V-72103
+    security_rhel7_audit_fremovexattr: yes                        # V-72119
+    security_rhel7_audit_fsetxattr: yes                           # V-72113
+    security_rhel7_audit_lchown: yes                              # V-72101
+    security_rhel7_audit_lremovexattr: yes                        # V-72121
+    security_rhel7_audit_lsetxattr: yes                           # V-72115
+    security_rhel7_audit_removexattr: yes                         # V-72117
+    security_rhel7_audit_setxattr: yes                            # V-72111
+    security_pwquality_apply_rules: yes                           # master switch to apply 'pwquality' rules
+    security_pwquality_require_minimum_password_length: yes       # V-71935
+    security_enable_pwquality_password_set: yes                   # V-73159
+    security_disable_account_if_password_expires: yes             # V-71941
+    security_pam_faillock_enable: yes                             # V-71945 / V-71943 / RHEL-07-010373
+    security_rhel7_remove_shosts_files: yes                       # V-72277
+    security_reset_perm_ownership: yes                            # V-71849
+    security_search_for_invalid_owner: yes                        # V-72007
+    security_search_for_invalid_group_owner: yes                  # V-72009
+    security_set_home_directory_permissions_and_owners: yes       # V-72017 / V-72019 / V-72021
+    security_find_world_writable_dirs: yes                        # V-72047
+    security_lock_session: yes                                    # V-71891
+    security_enable_virus_scanner: yes                            # V-72213
+    security_enable_firewalld: yes                                # V-72273
+    security_require_grub_authentication: yes                     # V-71961 / V-71963
+    # V-71961 / V-71963
+    # Use `grub2-setpassword` to create your own hash.
+    security_grub_password_hash: grub.pbkdf2.sha512.10000.[grub2-setpassword HERE]
+    security_package_clean_on_remove: yes                         # V-71987
+    security_rhel7_automatic_package_updates: yes                 # V-71999
+    security_check_package_checksums: yes                         # V-71855
+    security_enable_gpgcheck_repo: yes                            # V-71981
+    security_sshd_disallow_known_hosts_auth: yes                  # V-72249 / V-72239
+    security_disallow_ip_forwarding: yes                          # V-72309
+    security_require_grub_menu_authentication: yes                # V-81005
+
+  roles:
+    - disa-hardening
