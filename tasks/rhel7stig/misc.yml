@@ -206,6 +206,7 @@
     - security_run_virus_scanner_update | bool
   async: 300
   poll: 5
+  check_mode: no
   tags:
     - misc
     - V-72213
