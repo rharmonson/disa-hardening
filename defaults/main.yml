@@ -202,6 +202,8 @@ security_find_world_writable_dirs: no                        # V-72047
 security_disable_gdm_automatic_login: yes                    # V-71953
 # Disable timed gdm logins for guests
 security_disable_gdm_timed_login: yes                        # V-71955
+# Disable GDM list of users
+security_disable_gdm_user_list: no                           # V-none
 # Enable session locking for graphical logins.
 security_lock_session: no                                    # V-71891
 # Set a timer (in seconds) when an inactive session is locked.
